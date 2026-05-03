@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Barbearia — Agendamento</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--dark:#0E0E0E;--dark2:#1A1A1A;--dark3:#242424;--dark4:#2E2E2E;--text:#F0EDE6;--muted:#8A8680;--dim:#3A3A3A;--success:#4CAF7D;--danger:#E05555;--warn:#E0A020;--r:10px;--rl:16px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:'Montserrat',sans-serif;background:var(--dark);color:var(--text);font-size:14px;min-height:100vh;}
+.screen{display:none;flex-direction:column;min-height:100vh;}
+.screen.active{display:flex;}
+.hdr{background:var(--dark2);border-bottom:1px solid rgba(201,168,76,.2);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:99;}
+.hdr-logo{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:20px;color:var(--dark);flex-shrink:0;overflow:hidden;}
+.hdr-logo img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
+.hdr-title{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px;color:var(--gold);}
+.hdr-sub{font-size:10px;color:var(--muted);}
+.hdr-right{margin-left:auto;display:flex;gap:8px;}
+.ico-btn{background:var(--dark3);border:1px solid var(--dark4);border-radius:8px;padding:8px;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;transition:.2s;}
+.ico-btn:active{opacity:.7;}
+.body{padding:16px 18px;flex:1;}
+.btn{padding:13px 20px;border:none;border-radius:var(--r);font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:.15s;letter-spacing:.5px;width:100%;display:block;text-align:center;margin-bottom:10px;}
+.btn:active{transform:scale(.97);}
+.btn:last-child{margin-bottom:0;}
+.btn-gold{background:var(--gold);color:var(--dark);}
+.btn-outline{background:transparent;border:1px solid rgba(201,168,76,.4);color:var(--gold);}
+.btn-ghost{background:var(--dark3);color:var(--muted);border:1px solid var(--dark4);}
+.btn-danger{background:rgba(224,85,85,.12);color:var(--danger);border:1px solid rgba(224,85,85,.25);}
+.btn-success{background:rgba(76,175,125,.12);color:var(--success);border:1px solid rgba(76,175,125,.25);}
+.btn-warn{background:rgba(224,160,32,.12);color:var(--warn);border:1px solid rgba(224,160,32,.25);}
+.btn-sm{padding:8px 14px;font-size:11px;width:auto;display:inline-block;margin-bottom:0;}
+.fg{margin-bottom:14px;}
+.lbl{display:block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.inp,.sel{width:100%;background:var(--dark3);border:1px solid var(--dark4);color:var(--text);border-radius:var(--r);padding:12px 14px;font-family:'Montserrat',sans-serif;font-size:14px;transition:border .2s;-webkit-appearance:none;appearance:none;}
+.inp:focus,.sel:focus{outline:none;border-color:var(--gold);}
+.sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8680' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;}
+textarea.inp{resize:none;}
+.alert{border-radius:var(--r);padding:11px 13px;font-size:12px;margin-bottom:12px;line-height:1.5;}
+.a-warn{background:rgba(224,160,32,.1);border:1px solid rgba(224,160,32,.3);color:var(--warn);}
+.a-info{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+.a-danger{background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.3);color:var(--danger);}
+.a-ok{background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.3);color:var(--success);}
+.hero{background:linear-gradient(180deg,rgba(201,168,76,.07) 0%,transparent 100%);border-bottom:1px solid rgba(201,168,76,.1);padding:36px 20px 28px;text-align:center;}
+.hero-logo{width:64px;height:64px;background:var(--gold);border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:36px;color:var(--dark);margin:0 auto 14px;overflow:hidden;}
+.hero-logo img{width:100%;height:100%;object-fit:cover;border-radius:16px;}
+.hero-title{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;color:var(--gold);}
+.hero-sub{color:var(--muted);font-size:12px;margin-top:5px;line-height:1.6;}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 18px;}
+.role-card{background:var(--dark2);border:1px solid var(--dark3);border-radius:var(--rl);padding:24px 12px;text-align:center;cursor:pointer;transition:.2s;}
+.role-card:active{border-color:var(--gold);background:rgba(201,168,76,.06);}
+.role-icon{font-size:32px;margin-bottom:10px;}
+.role-name{font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;color:var(--gold);}
+.role-desc{font-size:10px;color:var(--muted);margin-top:3px;}
+.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.slot{background:var(--dark3);border:1px solid var(--dark4);border-radius:var(--r);padding:13px 4px;text-align:center;cursor:pointer;transition:.15s;font-weight:700;font-size:15px;line-height:1.2;}
+.slot-tag{font-size:9px;font-weight:500;color:var(--dim);margin-top:3px;}
+.slot.sel{background:var(--gold);border-color:var(--gold);color:var(--dark);}
+.slot.sel .slot-tag{color:rgba(0,0,0,.5);}
+.slot.taken{background:rgba(224,85,85,.07);border-color:rgba(224,85,85,.2);color:var(--danger);cursor:not-allowed;font-size:11px;}
+.slot.taken .slot-tag{color:rgba(224,85,85,.5);}
+.slot.past{opacity:.25;cursor:not-allowed;}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px;}
+.b-ag{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3);}
+.b-at{background:rgba(224,160,32,.15);color:var(--warn);border:1px solid rgba(224,160,32,.3);}
+.b-fi{background:rgba(76,175,125,.15);color:var(--success);border:1px solid rgba(76,175,125,.3);}
+.appt{background:var(--dark2);border:1px solid var(--dark3);border-radius:var(--rl);padding:14px;margin-bottom:10px;transition:border .2s;}
+.appt.at{border-color:rgba(224,160,32,.3);}
+.appt.fi{opacity:.65;}
+.appt-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.appt-time{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:1px;color:var(--gold);line-height:1;}
+.appt-name{font-weight:700;font-size:14px;margin-top:2px;}
+.appt-info{font-size:11px;color:var(--muted);margin-top:2px;}
+.appt-acts{display:flex;gap:8px;flex-wrap:wrap;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 18px 0;}
+.stat{background:var(--dark2);border:1px solid var(--dark3);border-radius:var(--r);padding:10px 6px;text-align:center;}
+.stat-n{font-family:'Bebas Neue',cursive;font-size:26px;color:var(--gold);line-height:1;}
+.stat-l{font-size:9px;color:var(--muted);margin-top:1px;letter-spacing:.5px;}
+.conf-box{background:var(--dark2);border:1px solid rgba(76,175,125,.25);border-radius:var(--rl);padding:22px 18px;text-align:center;margin-bottom:14px;}
+.conf-icon{font-size:44px;margin-bottom:10px;}
+.conf-title{font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:1px;color:var(--success);}
+.conf-sub{color:var(--muted);font-size:12px;margin-top:6px;}
+.conf-detail{background:var(--dark3);border-radius:var(--r);padding:12px;margin-top:14px;text-align:left;}
+.conf-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-top:1px solid var(--dark4);}
+.conf-row:first-child{border-top:none;}
+.conf-row span:first-child{color:var(--muted);}
+.conf-row span:last-child{font-weight:700;}
+.date-bar{display:flex;align-items:center;gap:8px;padding:12px 18px;}
+.date-bar input[type=date]{flex:1;background:var(--dark3);border:1px solid var(--dark4);color:var(--text);border-radius:var(--r);padding:10px 12px;font-family:'Montserrat',sans-serif;font-size:13px;-webkit-appearance:none;}
+.date-bar input:focus{outline:none;border-color:var(--gold);}
+.divider{border:none;border-top:1px solid var(--dark3);margin:16px 0;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-lbl{font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:1px;color:var(--muted);}
+.empty{text-align:center;padding:40px 20px;color:var(--dim);}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:.4;}
+.loading{text-align:center;padding:28px;color:var(--muted);font-size:12px;}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid var(--dark4);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.slide{animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;display:flex;align-items:flex-end;}
+.qr-sheet{background:var(--dark2);border-radius:20px 20px 0 0;padding:20px 18px 44px;width:100%;border-top:1px solid rgba(201,168,76,.2);}
+.qr-handle{width:36px;height:3px;background:var(--dark4);border-radius:2px;margin:0 auto 16px;}
+.qr-title{font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:1px;color:var(--gold);text-align:center;}
+.qr-sub{font-size:11px;color:var(--muted);text-align:center;margin-bottom:14px;}
+.qr-box{background:#fff;border-radius:12px;padding:14px;width:fit-content;margin:0 auto 14px;display:flex;justify-content:center;}
+.pix-info{background:var(--dark3);border-radius:var(--r);padding:12px;margin-bottom:14px;}
+.pix-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;}
+.pix-key-txt{font-size:10px;color:var(--muted);margin-top:4px;word-break:break-all;}
+.tabs{display:flex;border-bottom:1px solid var(--dark3);margin:0 18px;}
+.tab{flex:1;padding:12px 0;text-align:center;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-c{display:none;padding-top:14px;}
+.tab-c.on{display:block;}
+.upload{border:2px dashed var(--dark4);border-radius:var(--rl);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px;}
+.upload:active{border-color:rgba(201,168,76,.4);}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup" class="screen active">
+  <div class="hero">
+    <div class="hero-logo" id="setup-logo">B</div>
+    <div class="hero-title">BarberPro</div>
+    <div class="hero-sub">Configure seu sistema uma única vez</div>
+  </div>
+  <div class="body">
+    <div class="alert a-info">✅ Planilha já conectada! Só preencha os dados abaixo.</div>
+    <div class="fg"><label class="lbl">💈 Nome da Barbearia</label><input class="inp" id="c-name" placeholder="Ex: Barbearia do Zé" maxlength="40"></div>
+    <div class="fg"><label class="lbl">✂️ Serviços (um por linha)</label><textarea class="inp" id="c-services" rows="5" placeholder="Corte&#10;Barba&#10;Corte + Barba&#10;Hidratação&#10;Sobrancelha"></textarea></div>
+    <div class="fg"><label class="lbl">💰 Chave PIX</label><input class="inp" id="c-pix-key" placeholder="CPF, e-mail, telefone ou chave aleatória"></div>
+    <div class="fg"><label class="lbl">👤 Nome do Recebedor PIX</label><input class="inp" id="c-pix-name" placeholder="Nome que aparece no PIX"></div>
+    <div class="fg"><label class="lbl">🔐 Senha do Barbeiro</label><input class="inp" id="c-pass" type="password" placeholder="Mínimo 4 caracteres"></div>
+    <div class="fg">
+      <label class="lbl">🖼️ Logo (opcional)</label>
+      <div class="upload" onclick="document.getElementById('logo-inp').click()">
+        <div style="font-size:24px;margin-bottom:6px;opacity:.4;">📷</div>
+        <div style="font-size:11px;color:var(--muted);">Toque para fazer upload</div>
+      </div>
+      <input type="file" id="logo-inp" accept="image/*" style="display:none" onchange="uploadLogo(this)">
+    </div>
+    <div id="setup-err" class="alert a-danger" style="display:none;"></div>
+    <button class="btn btn-gold" onclick="saveSetup()">Entrar no App →</button>
+  </div>
+</div>
+
+<!-- ROLE -->
+<div id="role" class="screen">
+  <div class="hdr">
+    <div class="hdr-logo" id="r-logo">B</div>
+    <div><div class="hdr-title" id="r-name">BarberPro</div><div class="hdr-sub">Selecione o perfil</div></div>
+    <div class="hdr-right"><div class="ico-btn" onclick="goSettings()">⚙️</div></div>
+  </div>
+  <div style="padding:20px 18px 0;text-align:center;font-size:12px;color:var(--muted);">Como deseja entrar?</div>
+  <div class="role-grid">
+    <div class="role-card" onclick="goClient()"><div class="role-icon">💈</div><div class="role-name">Cliente</div><div class="role-desc">Agendar horário</div></div>
+    <div class="role-card" onclick="goLoginPage()"><div class="role-icon">✂️</div><div class="role-name">Barbeiro</div><div class="role-desc">Gerenciar agenda</div></div>
+  </div>
+</div>
+
+<!-- CLIENT -->
+<div id="client" class="screen">
+  <div class="hdr">
+    <div class="hdr-logo" id="cl-logo">B</div>
+    <div><div class="hdr-title" id="cl-name">Agendar</div><div class="hdr-sub">Escolha seu horário</div></div>
+    <div class="hdr-right"><div class="ico-btn" onclick="show('role')">✕</div></div>
+  </div>
+  <div class="body">
+    <div class="fg"><label class="lbl">📅 Data</label><input class="inp" type="date" id="cl-date" onchange="loadSlots()"></div>
+    <div class="sec-hdr"><span class="sec-lbl">⏰ Horários</span><span id="slots-spin" style="display:none;"><span class="spin"></span></span></div>
+    <div id="slots-alert"></div>
+    <div class="slot-grid" id="slot-grid"></div>
+    <hr class="divider">
+    <div id="cl-form" style="display:none;" class="slide">
+      <div class="sec-lbl" style="margin-bottom:12px;">📝 Seus dados</div>
+      <div class="fg"><label class="lbl">Nome completo</label><input class="inp" id="cl-nome" placeholder="João Silva" maxlength="60"></div>
+      <div class="fg"><label class="lbl">Telefone / WhatsApp</label><input class="inp" id="cl-tel" placeholder="(62) 9 9999-9999" type="tel" oninput="maskTel(this)"></div>
+      <div class="fg"><label class="lbl">Serviço</label><select class="sel" id="cl-serv"></select></div>
+      <div id="cl-err" class="alert a-danger" style="display:none;"></div>
+      <button class="btn btn-gold" id="cl-btn" onclick="submitAppt()">Confirmar Agendamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirm" class="screen">
+  <div class="hdr">
+    <div class="hdr-logo" id="cf-logo">B</div>
+    <div><div class="hdr-title">Confirmado!</div></div>
+  </div>
+  <div class="body">
+    <div class="conf-box slide">
+      <div class="conf-icon">✅</div>
+      <div class="conf-title">Agendamento Confirmado</div>
+      <div class="conf-sub">Seu horário foi reservado com sucesso!</div>
+      <div class="conf-detail">
+        <div class="conf-row"><span>Nome</span><span id="cf-nome">—</span></div>
+        <div class="conf-row"><span>Data</span><span id="cf-data">—</span></div>
+        <div class="conf-row"><span>Horário</span><span id="cf-hora">—</span></div>
+        <div class="conf-row"><span>Serviço</span><span id="cf-serv">—</span></div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" onclick="resetClient()">Fazer outro agendamento</button>
+  </div>
+</div>
+
+<!-- BARBER LOGIN -->
+<div id="login" class="screen">
+  <div class="hdr">
+    <div style="font-size:20px;">✂️</div>
+    <div><div class="hdr-title">Barbeiro</div><div class="hdr-sub">Área restrita</div></div>
+    <div class="hdr-right"><div class="ico-btn" onclick="show('role')">✕</div></div>
+  </div>
+  <div class="body" style="padding-top:32px;">
+    <div class="fg"><label class="lbl">Senha de acesso</label><input class="inp" id="b-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div id="login-err" class="alert a-danger" style="display:none;"></div>
+    <button class="btn btn-gold" onclick="doLogin()">Entrar</button>
+    <button class="btn btn-ghost" onclick="show('role')">← Voltar</button>
+  </div>
+</div>
+
+<!-- BARBER DASHBOARD -->
+<div id="barber" class="screen">
+  <div class="hdr">
+    <div class="hdr-logo" id="b-logo">B</div>
+    <div><div class="hdr-title" id="b-name">Agenda</div><div class="hdr-sub" id="b-date-lbl">Hoje</div></div>
+    <div class="hdr-right">
+      <div class="ico-btn" onclick="goSettings()">⚙️</div>
+      <div class="ico-btn" onclick="barberLogout()">🚪</div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n" id="st-done">0</div><div class="stat-l">Finalizados</div></div>
+    <div class="stat"><div class="stat-n" id="st-pend">0</div><div class="stat-l">Pendentes</div></div>
+  </div>
+  <div class="date-bar">
+    <input type="date" id="b-date" onchange="loadAgenda()">
+    <button class="btn btn-outline btn-sm" onclick="bToday()">Hoje</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadAgenda()">🔄</button>
+  </div>
+  <div class="body" style="padding-top:4px;">
+    <div id="b-loading" class="loading" style="display:none;"><span class="spin"></span> Carregando...</div>
+    <div id="b-empty" class="empty" style="display:none;"><div class="empty-icon">📅</div><div style="font-size:12px;">Nenhum agendamento nesta data</div></div>
+    <div id="b-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings" class="screen">
+  <div class="hdr">
+    <div style="font-size:18px;">⚙️</div>
+    <div><div class="hdr-title">Configurações</div></div>
+    <div class="hdr-right"><div class="ico-btn" onclick="show(prevScreen)">✕</div></div>
+  </div>
+  <div style="padding:0 18px;">
+    <div class="tabs">
+      <div class="tab on" onclick="switchTab(this,'tg')">Geral</div>
+      <div class="tab" onclick="switchTab(this,'tp')">PIX</div>
+      <div class="tab" onclick="switchTab(this,'ts')">Script</div>
+    </div>
+  </div>
+  <div class="body" style="padding-top:0;">
+    <div class="tab-c on" id="tg">
+      <div class="fg"><label class="lbl">Nome da Barbearia</label><input class="inp" id="s-name" placeholder="Nome"></div>
+      <div class="fg"><label class="lbl">Serviços (um por linha)</label><textarea class="inp" id="s-serv" rows="5"></textarea></div>
+      <div class="fg"><label class="lbl">Nova Senha do Barbeiro</label><input class="inp" id="s-pass" type="password" placeholder="Deixe em branco para não alterar"></div>
+      <div class="fg"><label class="lbl">Logo</label><div class="upload" onclick="document.getElementById('logo-inp2').click()"><div style="font-size:20px;opacity:.4;">📷</div><div style="font-size:11px;color:var(--muted);">Alterar logo</div></div><input type="file" id="logo-inp2" accept="image/*" style="display:none" onchange="uploadLogo(this)"></div>
+    </div>
+    <div class="tab-c" id="tp">
+      <div class="fg"><label class="lbl">Chave PIX</label><input class="inp" id="s-pix" placeholder="CPF, e-mail, telefone ou chave aleatória"></div>
+      <div class="fg"><label class="lbl">Nome do Recebedor</label><input class="inp" id="s-pix-nome" placeholder="Nome no PIX"></div>
+      <div class="fg"><label class="lbl">Cidade</label><input class="inp" id="s-pix-city" placeholder="Ex: GOIANIA"></div>
+    </div>
+    <div class="tab-c" id="ts">
+      <div class="fg"><label class="lbl">URL do Apps Script</label><input class="inp" id="s-url" type="url"></div>
+      <div class="alert a-warn">Altere somente se reimplantar o script.</div>
+    </div>
+    <div id="s-msg" class="alert" style="display:none;"></div>
+    <button class="btn btn-gold" onclick="saveSettings()">Salvar Configurações</button>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div id="qr-modal" style="display:none;" class="qr-overlay" onclick="if(event.target===this)closeQR()">
+  <div class="qr-sheet">
+    <div class="qr-handle"></div>
+    <div class="qr-title">Pagamento PIX</div>
+    <div class="qr-sub" id="qr-cli">Cliente</div>
+    <div class="qr-box"><div id="qrcode"></div></div>
+    <div class="pix-info">
+      <div class="pix-row"><span style="color:var(--muted)">Recebedor</span><span id="qr-recv" style="font-weight:700">—</span></div>
+      <div class="pix-key-txt" id="qr-key">—</div>
+    </div>
+    <button class="btn btn-ghost" onclick="closeQR()">Fechar</button>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwsv-7rp7XDhKiUjJ9ERMD-cb6hmKIcoT1ssL15l0_a0US3H_KBNwyKG0Hl08YJMweuSw/exec';
+const SLOTS=['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+const MONTHS=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+let cfg={};let selSlot=null;let appts=[];let prevScreen='role';
+
+window.onload=()=>{
+  const s=localStorage.getItem('bp_cfg');
+  if(s){cfg=JSON.parse(s);applyConfig();show('role');}
+  const t=today();
+  const cd=document.getElementById('cl-date');
+  const bd=document.getElementById('b-date');
+  if(cd)cd.value=t;
+  if(bd)bd.value=t;
+};
+
+function today(){return new Date().toISOString().split('T')[0];}
+function fmtDate(d){if(!d)return'';const[y,m,day]=d.split('-');return`${parseInt(day)} de ${MONTHS[parseInt(m)-1]} de ${y}`;}
+
+function applyConfig(){
+  const name=cfg.name||'BarberPro';
+  ['r-logo','cl-logo','cf-logo','b-logo'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.innerHTML=cfg.logo?`<img src="${cfg.logo}">`:(name[0]||'B').toUpperCase();
+  });
+  ['r-name','cl-name','b-name'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=name;});
+  document.title=name+' — Agendamento';
+  const sel=document.getElementById('cl-serv');
+  if(sel){sel.innerHTML='';(cfg.services||'Corte\nBarba\nCorte + Barba').split('\n').filter(s=>s.trim()).forEach(s=>{const o=document.createElement('option');o.value=o.textContent=s.trim();sel.appendChild(o);});}
+}
+
+function saveSetup(){
+  const name=document.getElementById('c-name').value.trim();
+  const pass=document.getElementById('c-pass').value;
+  const err=document.getElementById('setup-err');
+  if(!name){showErr(err,'Digite o nome da barbearia');return;}
+  if(!pass||pass.length<4){showErr(err,'Senha mínimo 4 caracteres');return;}
+  cfg={url:SCRIPT_URL,name,services:document.getElementById('c-services').value.trim()||'Corte\nBarba\nCorte + Barba',pixKey:document.getElementById('c-pix-key').value.trim(),pixName:document.getElementById('c-pix-name').value.trim(),pixCity:'GOIANIA',password:pass,logo:cfg.logo||''};
+  localStorage.setItem('bp_cfg',JSON.stringify(cfg));
+  applyConfig();show('role');
+}
+
+function uploadLogo(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>2*1024*1024){alert('Imagem muito grande. Máx 2MB.');return;}
+  const r=new FileReader();
+  r.onload=e=>{cfg.logo=e.target.result;const sl=document.getElementById('setup-logo');if(sl)sl.innerHTML=`<img src="${cfg.logo}">`;applyConfig();};
+  r.readAsDataURL(file);
+}
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const s=document.getElementById(id);if(s)s.classList.add('active');window.scrollTo(0,0);}
+
+function goClient(){selSlot=null;document.getElementById('cl-form').style.display='none';document.getElementById('cl-date').value=today();loadSlots();show('client');}
+function goLoginPage(){document.getElementById('b-pass').value='';document.getElementById('login-err').style.display='none';show('login');}
+
+function doLogin(){
+  const p=document.getElementById('b-pass').value;
+  const err=document.getElementById('login-err');
+  if(p===cfg.password){bToday();loadAgenda();show('barber');}
+  else showErr(err,'Senha incorreta');
+}
+
+function barberLogout(){show('role');}
+function bToday(){document.getElementById('b-date').value=today();updateBLbl();}
+function updateBLbl(){const d=document.getElementById('b-date').value;const l=document.getElementById('b-date-lbl');if(l)l.textContent=d===today()?'Hoje — '+fmtDate(d):fmtDate(d);}
+
+function goSettings(){
+  prevScreen=document.querySelector('.screen.active')?.id||'role';
+  document.getElementById('s-name').value=cfg.name||'';
+  document.getElementById('s-serv').value=cfg.services||'';
+  document.getElementById('s-pix').value=cfg.pixKey||'';
+  document.getElementById('s-pix-nome').value=cfg.pixName||'';
+  document.getElementById('s-pix-city').value=cfg.pixCity||'GOIANIA';
+  document.getElementById('s-url').value=cfg.url||SCRIPT_URL;
+  document.getElementById('s-pass').value='';
+  document.getElementById('s-msg').style.display='none';
+  show('settings');
+}
+
+function saveSettings(){
+  const msg=document.getElementById('s-msg');
+  const np=document.getElementById('s-pass').value;
+  cfg.name=document.getElementById('s-name').value.trim()||cfg.name;
+  cfg.services=document.getElementById('s-serv').value.trim()||cfg.services;
+  cfg.pixKey=document.getElementById('s-pix').value.trim();
+  cfg.pixName=document.getElementById('s-pix-nome').value.trim();
+  cfg.pixCity=document.getElementById('s-pix-city').value.trim()||'GOIANIA';
+  cfg.url=document.getElementById('s-url').value.trim()||SCRIPT_URL;
+  if(np&&np.length>=4)cfg.password=np;
+  localStorage.setItem('bp_cfg',JSON.stringify(cfg));
+  applyConfig();
+  msg.textContent='✅ Salvo com sucesso!';msg.className='alert a-ok';msg.style.display='block';
+  setTimeout(()=>{msg.style.display='none';show(prevScreen);},1400);
+}
+
+function switchTab(el,id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tab-c').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');document.getElementById(id).classList.add('on');
+}
+
+async function loadSlots(){
+  const date=document.getElementById('cl-date').value;if(!date)return;
+  selSlot=null;document.getElementById('cl-form').style.display='none';document.getElementById('slots-alert').innerHTML='';
+  const grid=document.getElementById('slot-grid');
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px;"><span class="spin"></span> Verificando...</div>';
+  document.getElementById('slots-spin').style.display='inline';
+  let taken=[];
+  try{const res=await api({action:'getSlots',date});taken=res.taken||[];}
+  catch(e){document.getElementById('slots-alert').innerHTML='<div class="alert a-warn">⚠️ Sem conexão. Horários podem não estar atualizados.</div>';}
+  document.getElementById('slots-spin').style.display='none';
+  const now=new Date();const isToday=date===today();const curH=now.getHours();const curM=now.getMinutes();
+  grid.innerHTML='';
+  SLOTS.forEach(slot=>{
+    const[h]=slot.split(':').map(Number);
+    const isPast=isToday&&(h<curH||(h===curH&&curM>0));
+    const isTaken=taken.includes(slot);
+    const div=document.createElement('div');
+    div.className='slot'+(isPast?' past':'')+(isTaken?' taken':'');
+    div.innerHTML=slot+'<div class="slot-tag">'+(isTaken?'Ocupado':isPast?'Passado':'Livre')+'</div>';
+    if(!isPast&&!isTaken)div.onclick=()=>pickSlot(slot,div);
+    grid.appendChild(div);
+  });
+}
+
+function pickSlot(slot,el){
+  document.querySelectorAll('.slot').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');selSlot=slot;
+  const form=document.getElementById('cl-form');form.style.display='block';
+  document.getElementById('cl-err').style.display='none';
+  setTimeout(()=>form.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+async function submitAppt(){
+  const nome=document.getElementById('cl-nome').value.trim();
+  const tel=document.getElementById('cl-tel').value.trim();
+  const serv=document.getElementById('cl-serv').value;
+  const date=document.getElementById('cl-date').value;
+  const err=document.getElementById('cl-err');
+  if(!selSlot){showErr(err,'Selecione um horário');return;}
+  if(!nome){showErr(err,'Digite seu nome');return;}
+  if(!tel){showErr(err,'Digite seu telefone');return;}
+  const btn=document.getElementById('cl-btn');btn.textContent='Agendando...';btn.disabled=true;
+  try{
+    const res=await api({action:'createAppointment',name:nome,phone:tel,service:serv,date,time:selSlot});
+    if(!res.success)throw new Error(res.error||'Horário já ocupado');
+    document.getElementById('cf-nome').textContent=nome;
+    document.getElementById('cf-data').textContent=fmtDate(date);
+    document.getElementById('cf-hora').textContent=selSlot;
+    document.getElementById('cf-serv').textContent=serv;
+    show('confirm');
+  }catch(e){
+    showErr(err,e.message||'Erro ao agendar. Tente novamente.');
+    btn.textContent='Confirmar Agendamento';btn.disabled=false;loadSlots();
+  }
+}
+
+function resetClient(){
+  document.getElementById('cl-nome').value='';document.getElementById('cl-tel').value='';
+  selSlot=null;
+  document.getElementById('cl-btn').textContent='Confirmar Agendamento';
+  document.getElementById('cl-btn').disabled=false;
+  document.getElementById('cl-form').style.display='none';
+  goClient();
+}
+
+async function loadAgenda(){
+  const date=document.getElementById('b-date').value;updateBLbl();
+  const list=document.getElementById('b-list');const load=document.getElementById('b-loading');const empty=document.getElementById('b-empty');
+  list.innerHTML='';load.style.display='block';empty.style.display='none';
+  let data=[];
+  try{const res=await api({action:'getAppointments',date});data=res.appointments||[];}
+  catch(e){list.innerHTML='<div class="alert a-danger">Erro ao carregar. Verifique a conexão.</div>';load.style.display='none';return;}
+  load.style.display='none';
+  appts=data.sort((a,b)=>a.time.localeCompare(b.time));
+  updStats();
+  if(!appts.length){empty.style.display='block';return;}
+  appts.forEach(a=>list.appendChild(mkCard(a)));
+}
+
+function updStats(){
+  document.getElementById('st-total').textContent=appts.length;
+  document.getElementById('st-done').textContent=appts.filter(a=>a.status==='Finalizado').length;
+  document.getElementById('st-pend').textContent=appts.filter(a=>a.status==='Agendado').length;
+}
+
+function mkCard(a){
+  const div=document.createElement('div');
+  div.id='ap-'+a.id;
+  div.className='appt'+(a.status==='Em atendimento'?' at':a.status==='Finalizado'?' fi':'');
+  const bc=a.status==='Em atendimento'?'b-at':a.status==='Finalizado'?'b-fi':'b-ag';
+  let acts='';
+  if(a.status==='Agendado')acts=`<button class="btn btn-outline btn-sm" onclick="updStatus('${a.id}','Em atendimento')">▶ Iniciar</button><button class="btn btn-danger btn-sm" onclick="cancelAppt('${a.id}')">Cancelar</button>`;
+  else if(a.status==='Em atendimento')acts=`<button class="btn btn-success btn-sm" onclick="finishAppt('${a.id}','${a.name}')">✓ Finalizar</button>`;
+  else if(a.status==='Finalizado')acts=`<button class="btn btn-warn btn-sm" onclick="showQR('${a.name}')">💳 PIX</button>`;
+  div.innerHTML=`<div class="appt-hdr"><div><div class="appt-time">${a.time}</div><div class="appt-name">${a.name}</div><div class="appt-info">✂️ ${a.service} · 📞 ${a.phone}</div></div><span class="badge ${bc}">${a.status}</span></div><div class="appt-acts">${acts}</div>`;
+  return div;
+}
+
+async function updStatus(id,status){
+  try{
+    await api({action:'updateStatus',id,status});
+    const a=appts.find(x=>x.id===id);
+    if(a){a.status=status;document.getElementById('ap-'+id)?.replaceWith(mkCard(a));}
+    updStats();
+  }catch(e){alert('Erro ao atualizar status');}
+}
+
+async function finishAppt(id,name){await updStatus(id,'Finalizado');showQR(name);}
+
+async function cancelAppt(id){
+  if(!confirm('Cancelar este agendamento?'))return;
+  try{
+    await api({action:'cancelAppointment',id});
+    appts=appts.filter(a=>a.id!==id);
+    document.getElementById('ap-'+id)?.remove();
+    updStats();
+    if(!appts.length)document.getElementById('b-empty').style.display='block';
+  }catch(e){alert('Erro ao cancelar');}
+}
+
+function showQR(name){
+  document.getElementById('qr-modal').style.display='flex';
+  document.getElementById('qr-cli').textContent=name;
+  document.getElementById('qr-recv').textContent=cfg.pixName||'—';
+  document.getElementById('qr-key').textContent='Chave: '+(cfg.pixKey||'—');
+  const box=document.getElementById('qrcode');box.innerHTML='';
+  if(cfg.pixKey){
+    try{new QRCode(box,{text:genPix(cfg.pixKey,cfg.pixName,cfg.pixCity),width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});}
+    catch(e){box.innerHTML='<p style="color:#888;font-size:11px;padding:16px;text-align:center;">Erro ao gerar QR Code</p>';}
+  }else{box.innerHTML='<p style="color:#888;font-size:11px;padding:16px;text-align:center;">Configure a chave PIX<br>nas Configurações</p>';}
+}
+
+function closeQR(){document.getElementById('qr-modal').style.display='none';}
+
+function genPix(key,name,city){
+  const k=key.replace(/\s/g,'');
+  const n=(name||'Recebedor').substring(0,25).toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+  const c=(city||'GOIANIA').substring(0,15).toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+  function lv(s){return s.length.toString().padStart(2,'0')+s;}
+  const gui='26'+lv('0014BR.GOV.BCB.PIX01'+lv(k));
+  const body='000201'+gui+'52040000'+'5303986'+'5802BR'+'59'+lv(n)+'60'+lv(c)+'6207'+'0503***'+'6304';
+  let crc=0xFFFF;
+  for(let i=0;i<body.length;i++){crc^=body.charCodeAt(i)<<8;for(let j=0;j<8;j++)crc=(crc&0x8000)?(crc<<1)^0x1021:crc<<1;}
+  return body+((crc&0xFFFF).toString(16).toUpperCase().padStart(4,'0'));
+}
+
+async function api(data){
+  const url=cfg.url||SCRIPT_URL;
+  const res=await fetch(url,{method:'POST',body:JSON.stringify(data),headers:{'Content-Type':'text/plain'}});
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  return res.json();
+}
+
+function showErr(el,msg){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}
+function maskTel(el){let v=el.value.replace(/\D/g,'');if(v.length<=10)v=v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');else v=v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');el.value=v;}
+</script>
+</body>
+</html>
